@@ -1,0 +1,6 @@
+@university_certificates_HostAddress = http://localhost:5281
+
+GET {{university_certificates_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
