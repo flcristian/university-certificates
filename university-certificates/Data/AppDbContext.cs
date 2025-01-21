@@ -8,9 +8,6 @@ namespace UniversityCertificates.Data
         {
         }
 
-        // Define your DbSets (tables) here
-        // public DbSet<YourEntity> YourEntities { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,0 +1,62 @@
+services:
+  api:
+    restart: unless-stopped
+    container_name: ${COMPOSE_PROJECT_NAME:-app}-api
+    image: ${DCR:-localhost}/${DCR_ORG:-local}/${DCR_REPO:-app}-api:${DCR_TAG:-latest}
+    build:
+      context: .
+      dockerfile: .docker/aspnet/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+        ENVIRONMENT: ${ENVIRONMENT:-development}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT:-development}
+      - USER_ID=${USER_ID:-1000}
+      - GROUP_ID=${GROUP_ID:-1000}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+    volumes:
+      - .:/app:rw
+      - ${USERPROFILE:-~}/.nuget/packages:/home/dotnet/.nuget/packages:rw
+    ports:
+      - "${API_PORT:-8000}:80"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    container_name: ${COMPOSE_PROJECT_NAME:-app}-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USER}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
