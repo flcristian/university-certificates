@@ -8,7 +8,7 @@ public class CreateStudentsTable : Migration
     public override void Up()
     {
         Create
-            .Table("students")
+            .Table("Students")
             .WithColumn("serial_number")
             .AsInt32()
             .PrimaryKey()
