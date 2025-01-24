@@ -33,7 +33,7 @@ jobs:
         USERNAME=${{ secrets.USERNAME }}
         GROUPNAME=${{ secrets.GROUPNAME }}
         API_PORT=${{ secrets.API_PORT }}
-        DB_HOST=localhost
+        DB_HOST=mariadb
         DB_NAME=${{ secrets.DB_NAME }}
         DB_USER=${{ secrets.DB_USER }}
         DB_PASSWORD=${{ secrets.DB_PASSWORD }}
