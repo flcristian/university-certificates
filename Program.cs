@@ -58,7 +58,8 @@ string connectionString =
     + $"Port={Env.GetString("DB_PORT")};"
     + $"Database={Env.GetString("DB_NAME")};"
     + $"Uid={Env.GetString("DB_USER")};"
-    + $"Pwd={Env.GetString("DB_PASSWORD")}";
+    + $"Pwd={Env.GetString("DB_PASSWORD")};"
+    + "SslMode=None";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
