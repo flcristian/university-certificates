@@ -1,0 +1,112 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0'
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+    
+    - name: Create .env file
+      run: |
+        cat << EOF > .env
+        DOCKER_USER=${{ secrets.DOCKER_USER }}
+        COMPOSE_PROJECT_NAME=${{ secrets.COMPOSE_PROJECT_NAME }}
+        PROJECT_NAME=${{ secrets.PROJECT_NAME }}
+        USER_ID=${{ secrets.USER_ID }}
+        GROUP_ID=${{ secrets.GROUP_ID }}
+        USERNAME=${{ secrets.USERNAME }}
+        GROUPNAME=${{ secrets.GROUPNAME }}
+        API_PORT=${{ secrets.API_PORT }}
+        DB_HOST=localhost
+        DB_NAME=${{ secrets.DB_NAME }}
+        DB_USER=${{ secrets.DB_USER }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        DB_PORT=${{ secrets.DB_PORT }}
+        EOF
+    
+    - name: Build and push Docker image
+      run: |
+        # Step 1: Restore NuGet packages
+        mkdir .nuget
+        dotnet restore
+
+        # Step 2: Build and push Docker image
+        chmod +x setup-deployment.sh
+        ./setup-deployment.sh
+    
+    - name: Install Docker on remote server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        debug: true
+        script: |
+          if ! command -v docker &> /dev/null; then
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            sudo usermod -aG docker $USER
+          fi
+          if ! command -v docker-compose &> /dev/null; then
+            sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+
+    - name: Create and copy .env file
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: ".env"
+        target: "deployment/"
+    
+    - name: Deploy to server
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: ".deployment/*"
+        target: "deployment/"
+        strip_components: 1
+    
+    - name: Install requirements on remote server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          sudo apt update -y
+          sudo apt upgrade -y
+          sudo apt install docker-compose -y
+          sudo apt install make -y
+    
+    - name: Execute remote commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd deployment
+          sudo make clean
+          sudo docker-compose pull
+          sudo make setup
