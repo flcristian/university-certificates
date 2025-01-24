@@ -1,4 +1,5 @@
 using DotNetEnv;
+using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using UniversityCertificates.Data;
@@ -54,7 +55,7 @@ builder.Services.AddCors(options =>
 
 string connectionString =
     $"Server={Env.GetString("DB_HOST")};"
-    + $"Port={Env.GetString("DB_PORT")};"
+    + $"Port=3306;"
     + $"Database={Env.GetString("DB_NAME")};"
     + $"Uid={Env.GetString("DB_USER")};"
     + $"Pwd={Env.GetString("DB_PASSWORD")};";
@@ -62,6 +63,16 @@ string connectionString =
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
+
+builder
+    .Services.AddFluentMigratorCore()
+    .ConfigureRunner(rb =>
+        rb.AddMySql8()
+            .WithGlobalConnectionString(connectionString)
+            .ScanIn(typeof(Program).Assembly)
+            .For.Migrations()
+    )
+    .AddLogging(lb => lb.AddFluentMigratorConsole());
 
 WebApplication app = builder.Build();
 
@@ -81,6 +92,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IMigrationRunner runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+    runner.MigrateUp();
+}
 
 app.UseCors("university-certificates");
 app.Run();
