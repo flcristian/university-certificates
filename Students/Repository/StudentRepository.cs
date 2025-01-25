@@ -38,14 +38,6 @@ public class StudentRepository : IStudentRepository
         return addedStudent.Entity;
     }
 
-    public async Task<Student> DeleteStudentAsync(int serialNumber)
-    {
-        Student student = (await _context.Students.FindAsync(serialNumber))!;
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
-        return student;
-    }
-
     public async Task<Student> UpdateStudentAsync(UpdateStudentRequest request)
     {
         Student student = (await _context.Students.FindAsync(request.SerialNumber))!;
@@ -59,5 +51,13 @@ public class StudentRepository : IStudentRepository
         EntityEntry<Student> updatedStudent = _context.Students.Update(student);
         await _context.SaveChangesAsync();
         return updatedStudent.Entity;
+    }
+
+    public async Task<Student> DeleteStudentAsync(int serialNumber)
+    {
+        Student student = (await _context.Students.FindAsync(serialNumber))!;
+        _context.Students.Remove(student);
+        await _context.SaveChangesAsync();
+        return student;
     }
 }

@@ -1,8 +1,13 @@
+using System.Text.Json.Serialization;
 using DotNetEnv;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using UniversityCertificates.Data;
+using UniversityCertificates.Register.Repository;
+using UniversityCertificates.Register.Repository.Interfaces;
+using UniversityCertificates.Register.Services;
+using UniversityCertificates.Register.Services.Interfaces;
 using UniversityCertificates.Students.Repository;
 using UniversityCertificates.Students.Repository.Interfaces;
 using UniversityCertificates.Students.Services;
@@ -11,7 +16,13 @@ using UniversityCertificates.System;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder
+    .Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.MaxDepth = 2;
+    });
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -20,6 +31,10 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IStudentQueryService, StudentQueryService>();
 builder.Services.AddScoped<IStudentCommandService, StudentCommandService>();
+
+builder.Services.AddScoped<IRegisterEntriesRepository, RegisterEntriesRepository>();
+builder.Services.AddScoped<IRegisterEntriesQueryService, RegisterEntriesQueryService>();
+builder.Services.AddScoped<IRegisterEntriesCommandService, RegisterEntriesCommandService>();
 
 #endregion
 

@@ -1,4 +1,6 @@
 using AutoMapper;
+using UniversityCertificates.Register.DTOs;
+using UniversityCertificates.Register.Models;
 using UniversityCertificates.Students.DTOs;
 using UniversityCertificates.Students.Models;
 
@@ -10,5 +12,7 @@ public class MappingProfile : Profile
     {
         CreateMap<CreateStudentRequest, Student>();
         CreateMap<UpdateStudentRequest, Student>();
+        CreateMap<CreateRegisterEntryRequest, RegisterEntry>();
+        CreateMap<UpdateRegisterEntryRequest, RegisterEntry>();
     }
 }

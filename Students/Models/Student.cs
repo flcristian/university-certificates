@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using UniversityCertificates.Register.Models;
 
 namespace UniversityCertificates.Students.Models;
 
@@ -29,4 +30,6 @@ public class Student
     [Required]
     [Column("department")]
     public required string Department { get; set; }
+
+    public virtual required IEnumerable<RegisterEntry> RegisterEntries { get; set; }
 }

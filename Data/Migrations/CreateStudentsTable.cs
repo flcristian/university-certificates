@@ -28,10 +28,20 @@ public class CreateStudentsTable : Migration
             .WithColumn("department")
             .AsString(64)
             .NotNullable();
+
+        Create.Index("IX_Students_First_Name").OnTable("Students").OnColumn("first_name");
+
+        Create.Index("IX_Students_Last_Name").OnTable("Students").OnColumn("last_name");
+
+        Create.Index("IX_Students_StudyYear").OnTable("Students").OnColumn("study_year");
+
+        Create.Index("IX_Students_Department").OnTable("Students").OnColumn("department");
+
+        Create.Index("IX_Students_DegreeType").OnTable("Students").OnColumn("degree_type");
     }
 
     public override void Down()
     {
-        Delete.Table("students");
+        Delete.Table("Students");
     }
 }
