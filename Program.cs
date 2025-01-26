@@ -87,7 +87,7 @@ builder.Services.AddCors(options =>
 
 string connectionString =
     $"Server={Env.GetString("DB_HOST")};"
-    + $"Port=3307;"
+    + $"Port=3306;"
     + $"Database={Env.GetString("DB_NAME")};"
     + $"Uid={Env.GetString("DB_USER")};"
     + $"Pwd={Env.GetString("DB_PASSWORD")};";
