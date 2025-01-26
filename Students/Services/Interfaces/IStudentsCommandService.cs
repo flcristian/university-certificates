@@ -3,7 +3,7 @@ using UniversityCertificates.Students.Models;
 
 namespace UniversityCertificates.Students.Services.Interfaces;
 
-public interface IStudentCommandService
+public interface IStudentsCommandService
 {
     Task<Student> AddStudentAsync(CreateStudentRequest request);
 

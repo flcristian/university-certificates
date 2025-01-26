@@ -1,3 +1,4 @@
+using DotNetEnv;
 using FluentMigrator;
 
 namespace UniversityCertificates.Data.Migrations;
@@ -19,6 +20,9 @@ public class CreateStudentsTable : Migration
             .WithColumn("last_name")
             .AsString(64)
             .NotNullable()
+            .WithColumn("email")
+            .AsString(64)
+            .NotNullable()
             .WithColumn("study_year")
             .AsInt16()
             .NotNullable()
@@ -33,11 +37,31 @@ public class CreateStudentsTable : Migration
 
         Create.Index("IX_Students_Last_Name").OnTable("Students").OnColumn("last_name");
 
+        Create.Index("IX_Students_Email").OnTable("Students").OnColumn("email");
+
         Create.Index("IX_Students_StudyYear").OnTable("Students").OnColumn("study_year");
 
         Create.Index("IX_Students_Department").OnTable("Students").OnColumn("department");
 
         Create.Index("IX_Students_DegreeType").OnTable("Students").OnColumn("degree_type");
+
+        Env.GetString("STUDENT_EMAIL");
+        if (Env.GetString("STUDENT_EMAIL") != null)
+        {
+            Insert
+                .IntoTable("Students")
+                .Row(
+                    new
+                    {
+                        first_name = "Florescu",
+                        last_name = "Cristian Ioan",
+                        email = Env.GetString("STUDENT_EMAIL"),
+                        study_year = 2,
+                        degree_type = 0,
+                        department = "Computer Science",
+                    }
+                );
+        }
     }
 
     public override void Down()

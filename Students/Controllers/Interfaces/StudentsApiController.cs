@@ -6,36 +6,37 @@ namespace UniversityCertificates.Students.Controllers.Interfaces;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public abstract class StudentApiController : ControllerBase
+public abstract class StudentsApiController : ControllerBase
 {
     [HttpGet("all")]
     [ProducesResponseType(statusCode: 200, type: typeof(IEnumerable<Student>))]
-    [ProducesResponseType(statusCode: 404, type: typeof(String))]
+    [ProducesResponseType(statusCode: 404, type: typeof(string))]
     public abstract Task<ActionResult<IEnumerable<Student>>> GetStudents();
 
     [HttpGet("student/{serialNumber}")]
     [ProducesResponseType(statusCode: 200, type: typeof(Student))]
-    [ProducesResponseType(statusCode: 404, type: typeof(String))]
+    [ProducesResponseType(statusCode: 404, type: typeof(string))]
     public abstract Task<ActionResult<Student>> GetStudentBySerialNumber(
         [FromRoute] int serialNumber
     );
 
     [HttpPost("create")]
     [ProducesResponseType(statusCode: 201, type: typeof(Student))]
-    [ProducesResponseType(statusCode: 409, type: typeof(String))]
+    [ProducesResponseType(statusCode: 409, type: typeof(string))]
     public abstract Task<ActionResult<Student>> CreateStudent(
         [FromBody] CreateStudentRequest request
     );
 
     [HttpPut("update")]
     [ProducesResponseType(statusCode: 202, type: typeof(Student))]
-    [ProducesResponseType(statusCode: 404, type: typeof(String))]
+    [ProducesResponseType(statusCode: 400, type: typeof(string))]
+    [ProducesResponseType(statusCode: 404, type: typeof(string))]
     public abstract Task<ActionResult<Student>> UpdateStudent(
         [FromBody] UpdateStudentRequest request
     );
 
     [HttpDelete("delete/{serialNumber}")]
     [ProducesResponseType(statusCode: 202, type: typeof(Student))]
-    [ProducesResponseType(statusCode: 404, type: typeof(String))]
+    [ProducesResponseType(statusCode: 404, type: typeof(string))]
     public abstract Task<ActionResult<Student>> DeleteStudent([FromRoute] int serialNumber);
 }

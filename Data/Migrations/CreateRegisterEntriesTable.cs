@@ -2,7 +2,7 @@ using FluentMigrator;
 
 namespace UniversityCertificates.Data.Migrations;
 
-[Migration(250120251)]
+[Migration(260120251)]
 public class CreateRegisterEntriesTable : Migration
 {
     public override void Up()
@@ -23,7 +23,19 @@ public class CreateRegisterEntriesTable : Migration
             .NotNullable()
             .WithColumn("reason")
             .AsString(64)
-            .NotNullable();
+            .NotNullable()
+            .WithColumn("reviewed")
+            .AsBoolean()
+            .WithDefaultValue(false)
+            .NotNullable()
+            .WithColumn("accepted")
+            .AsBoolean()
+            .WithDefaultValue(false)
+            .NotNullable()
+            .WithColumn("selected_template_id")
+            .AsInt32()
+            .Nullable()
+            .ForeignKey("FK_RegisterEntries_CertificateTemplates", "CertificateTemplates", "id");
 
         Create
             .Index("IX_RegisterEntries_StudentSerialNumber")

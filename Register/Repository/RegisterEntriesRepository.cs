@@ -20,20 +20,27 @@ public class RegisterEntriesRepository : IRegisterEntriesRepository
 
     public async Task<IEnumerable<RegisterEntry>> GetRegisterEntriesAsync()
     {
-        return await _context.RegisterEntries.ToListAsync();
+        return await _context
+            .RegisterEntries.Include(re => re.Student)
+            .Include(re => re.SelectedTemplate)
+            .ToListAsync();
     }
 
-    public async Task<RegisterEntry?> GetRegisterEntryAsync(int id)
+    public async Task<RegisterEntry?> GetRegisterEntryByIdAsync(int id)
     {
-        return await _context.RegisterEntries.FindAsync(id);
+        return await _context
+            .RegisterEntries.Include(re => re.Student)
+            .Include(re => re.SelectedTemplate)
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<RegisterEntry> AddRegisterEntryAsync(CreateRegisterEntryRequest request)
     {
         RegisterEntry registerEntry = _mapper.Map<RegisterEntry>(request);
-        _context.RegisterEntries.Add(registerEntry);
+
+        RegisterEntry addedRegistryEntry = _context.RegisterEntries.Add(registerEntry).Entity;
         await _context.SaveChangesAsync();
-        return registerEntry;
+        return addedRegistryEntry;
     }
 
     public async Task<RegisterEntry> UpdateRegisterEntryAsync(UpdateRegisterEntryRequest request)
@@ -44,6 +51,10 @@ public class RegisterEntriesRepository : IRegisterEntriesRepository
             request.StudentSerialNumber ?? registerEntry.StudentSerialNumber;
         registerEntry.DateOfIssue = request.DateOfIssue ?? registerEntry.DateOfIssue;
         registerEntry.Reason = request.Reason ?? registerEntry.Reason;
+        registerEntry.Reviewed = request.Reviewed ?? registerEntry.Reviewed;
+        registerEntry.Accepted = request.Accepted ?? registerEntry.Accepted;
+        registerEntry.SelectedTemplateId =
+            request.SelectedTemplate ?? registerEntry.SelectedTemplateId;
 
         RegisterEntry updatedRegisterEntry = _context.RegisterEntries.Update(registerEntry).Entity;
         await _context.SaveChangesAsync();

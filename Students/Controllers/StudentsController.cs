@@ -7,16 +7,16 @@ using UniversityCertificates.System.Exceptions;
 
 namespace UniversityCertificates.Students.Controllers;
 
-public class StudentController : StudentApiController
+public class StudentsController : StudentsApiController
 {
-    private readonly IStudentQueryService _studentQueryService;
-    private readonly IStudentCommandService _studentCommandService;
-    private readonly ILogger<StudentController> _logger;
+    private readonly IStudentsQueryService _studentQueryService;
+    private readonly IStudentsCommandService _studentCommandService;
+    private readonly ILogger<StudentsController> _logger;
 
-    public StudentController(
-        IStudentQueryService studentQueryService,
-        IStudentCommandService studentCommandService,
-        ILogger<StudentController> logger
+    public StudentsController(
+        IStudentsQueryService studentQueryService,
+        IStudentsCommandService studentCommandService,
+        ILogger<StudentsController> logger
     )
     {
         _studentQueryService = studentQueryService;
@@ -43,7 +43,9 @@ public class StudentController : StudentApiController
     {
         try
         {
-            Student student = await _studentQueryService.GetStudentAsync(serialNumber);
+            Student student = await _studentQueryService.GetStudentBySerialNumberAsync(
+                serialNumber
+            );
 
             return Ok(student);
         }
@@ -85,6 +87,11 @@ public class StudentController : StudentApiController
         {
             _logger.LogError(e.Message);
             return NotFound(e.Message);
+        }
+        catch (InvalidValueException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(e.Message);
         }
     }
 

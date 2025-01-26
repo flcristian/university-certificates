@@ -2,9 +2,9 @@ using UniversityCertificates.Students.Models;
 
 namespace UniversityCertificates.Students.Services.Interfaces;
 
-public interface IStudentQueryService
+public interface IStudentsQueryService
 {
     Task<IEnumerable<Student>> GetStudentsAsync();
 
-    Task<Student> GetStudentAsync(int serialNumber);
+    Task<Student> GetStudentBySerialNumberAsync(int serialNumber);
 }

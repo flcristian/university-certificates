@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using UniversityCertificates.Certificates.Models;
 using UniversityCertificates.Register.Models;
 using UniversityCertificates.Students.Models;
 
@@ -11,6 +12,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Student> Students { get; set; }
     public DbSet<RegisterEntry> RegisterEntries { get; set; }
+    public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +20,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Student>().ToTable("Students");
         modelBuilder.Entity<RegisterEntry>().ToTable("RegisterEntries");
+        modelBuilder.Entity<CertificateTemplate>().ToTable("CertificateTemplates");
 
         modelBuilder
             .Entity<RegisterEntry>()
@@ -26,5 +29,13 @@ public class AppDbContext : DbContext
             .HasForeignKey(re => re.StudentSerialNumber)
             .HasPrincipalKey(s => s.SerialNumber)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder
+            .Entity<RegisterEntry>()
+            .HasOne(re => re.SelectedTemplate)
+            .WithMany(ct => ct.RegisterEntries)
+            .HasForeignKey(re => re.SelectedTemplateId)
+            .HasPrincipalKey(ct => ct.Id)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

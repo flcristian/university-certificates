@@ -6,11 +6,11 @@ using UniversityCertificates.System.Exceptions;
 
 namespace UniversityCertificates.Students.Services;
 
-public class StudentQueryService : IStudentQueryService
+public class StudentsQueryService : IStudentsQueryService
 {
-    private readonly IStudentRepository _studentRepository;
+    private readonly IStudentsRepository _studentRepository;
 
-    public StudentQueryService(IStudentRepository studentRepository)
+    public StudentsQueryService(IStudentsRepository studentRepository)
     {
         _studentRepository = studentRepository;
     }
@@ -27,9 +27,9 @@ public class StudentQueryService : IStudentQueryService
         return students;
     }
 
-    public async Task<Student> GetStudentAsync(int serialNumber)
+    public async Task<Student> GetStudentBySerialNumberAsync(int serialNumber)
     {
-        Student? student = await _studentRepository.GetStudentAsync(serialNumber);
+        Student? student = await _studentRepository.GetStudentBySerialNumberAsync(serialNumber);
 
         if (student == null)
         {

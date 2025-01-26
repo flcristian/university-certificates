@@ -7,7 +7,7 @@ public interface IRegisterEntriesRepository
 {
     public Task<IEnumerable<RegisterEntry>> GetRegisterEntriesAsync();
 
-    public Task<RegisterEntry?> GetRegisterEntryAsync(int id);
+    public Task<RegisterEntry?> GetRegisterEntryByIdAsync(int id);
 
     public Task<RegisterEntry> AddRegisterEntryAsync(CreateRegisterEntryRequest request);
 

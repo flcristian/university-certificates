@@ -3,6 +3,10 @@ using DotNetEnv;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using UniversityCertificates.Certificates.Repository;
+using UniversityCertificates.Certificates.Repository.Interfaces;
+using UniversityCertificates.Certificates.Services;
+using UniversityCertificates.Certificates.Services.Interfaces;
 using UniversityCertificates.Data;
 using UniversityCertificates.Register.Repository;
 using UniversityCertificates.Register.Repository.Interfaces;
@@ -20,21 +24,34 @@ builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-        options.JsonSerializerOptions.MaxDepth = 2;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
+
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 #region SERVICES
 
-builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<IStudentQueryService, StudentQueryService>();
-builder.Services.AddScoped<IStudentCommandService, StudentCommandService>();
+builder.Services.AddScoped<IStudentsRepository, StudentsRepository>();
+builder.Services.AddScoped<IStudentsQueryService, StudentsQueryService>();
+builder.Services.AddScoped<IStudentsCommandService, StudentsCommandService>();
 
 builder.Services.AddScoped<IRegisterEntriesRepository, RegisterEntriesRepository>();
 builder.Services.AddScoped<IRegisterEntriesQueryService, RegisterEntriesQueryService>();
 builder.Services.AddScoped<IRegisterEntriesCommandService, RegisterEntriesCommandService>();
+builder.Services.AddScoped<IRegisterEntryQRCodesService, RegisterEntryQRCodesService>();
+builder.Services.AddScoped<IRegisterEntryDocumentsService, RegisterEntryDocumentsService>();
+
+builder.Services.AddScoped<ICertificateTemplatesRepository, CertificateTemplatesRepository>();
+builder.Services.AddScoped<
+    ICertificateTemplateFilesRepository,
+    CertificateTemplateFilesRepository
+>();
+builder.Services.AddScoped<ICertificateTemplatesQueryService, CertificateTemplatesQueryService>();
+builder.Services.AddScoped<
+    ICertificateTemplatesCommandService,
+    CertificateTemplatesCommandService
+>();
 
 #endregion
 
@@ -70,7 +87,7 @@ builder.Services.AddCors(options =>
 
 string connectionString =
     $"Server={Env.GetString("DB_HOST")};"
-    + $"Port=3306;"
+    + $"Port=3307;"
     + $"Database={Env.GetString("DB_NAME")};"
     + $"Uid={Env.GetString("DB_USER")};"
     + $"Pwd={Env.GetString("DB_PASSWORD")};";

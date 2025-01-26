@@ -30,7 +30,9 @@ public class RegisterEntriesQueryService : IRegisterEntriesQueryService
 
     public async Task<RegisterEntry> GetRegisterEntryAsync(int id)
     {
-        RegisterEntry? registerEntry = await _registerEntriesRepository.GetRegisterEntryAsync(id);
+        RegisterEntry? registerEntry = await _registerEntriesRepository.GetRegisterEntryByIdAsync(
+            id
+        );
 
         if (registerEntry == null)
         {

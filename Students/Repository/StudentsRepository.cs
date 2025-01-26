@@ -8,34 +8,36 @@ using UniversityCertificates.Students.Repository.Interfaces;
 
 namespace UniversityCertificates.Students.Repository;
 
-public class StudentRepository : IStudentRepository
+public class StudentsRepository : IStudentsRepository
 {
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
 
-    public StudentRepository(AppDbContext context, IMapper mapper)
+    public StudentsRepository(AppDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
     }
 
-    public async Task<Student?> GetStudentAsync(int serialNumber)
-    {
-        return await _context.Students.FindAsync(serialNumber);
-    }
-
     public async Task<IEnumerable<Student>> GetStudentsAsync()
     {
-        return await _context.Students.ToListAsync();
+        return await _context.Students.Include(s => s.RegisterEntries).ToListAsync();
+    }
+
+    public async Task<Student?> GetStudentBySerialNumberAsync(int serialNumber)
+    {
+        return await _context
+            .Students.Include(s => s.RegisterEntries)
+            .FirstOrDefaultAsync(s => s.SerialNumber == serialNumber);
     }
 
     public async Task<Student> AddStudentAsync(CreateStudentRequest request)
     {
         Student student = _mapper.Map<Student>(request);
 
-        EntityEntry<Student> addedStudent = _context.Students.Add(student);
+        Student addedStudent = _context.Students.Add(student).Entity;
         await _context.SaveChangesAsync();
-        return addedStudent.Entity;
+        return addedStudent;
     }
 
     public async Task<Student> UpdateStudentAsync(UpdateStudentRequest request)
@@ -44,13 +46,14 @@ public class StudentRepository : IStudentRepository
 
         student.FirstName = request.FirstName ?? student.FirstName;
         student.LastName = request.LastName ?? student.LastName;
+        student.Email = request.Email ?? student.Email;
         student.StudyYear = request.StudyYear ?? student.StudyYear;
         student.DegreeType = request.DegreeType ?? student.DegreeType;
         student.Department = request.Department ?? student.Department;
 
-        EntityEntry<Student> updatedStudent = _context.Students.Update(student);
+        Student updatedStudent = _context.Students.Update(student).Entity;
         await _context.SaveChangesAsync();
-        return updatedStudent.Entity;
+        return updatedStudent;
     }
 
     public async Task<Student> DeleteStudentAsync(int serialNumber)

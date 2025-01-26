@@ -20,6 +20,10 @@ public class Student
     public required string LastName { get; set; }
 
     [Required]
+    [Column("email")]
+    public required string Email { get; set; }
+
+    [Required]
     [Column("study_year")]
     public required int StudyYear { get; set; }
 
