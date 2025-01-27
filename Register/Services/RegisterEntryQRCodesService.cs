@@ -14,7 +14,7 @@ namespace UniversityCertificates.Register.Services;
 public class RegisterEntryQRCodesService : IRegisterEntryQRCodesService
 {
     private readonly IRegisterEntriesRepository _registerEntriesRepository;
-    private const int QR_CODE_SIZE = 256;
+    private const int QR_CODE_SIZE = 128;
 
     public RegisterEntryQRCodesService(IRegisterEntriesRepository registerEntriesRepository)
     {
