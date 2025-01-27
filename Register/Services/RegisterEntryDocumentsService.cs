@@ -1,7 +1,5 @@
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using SkiaSharp;
 using UniversityCertificates.Certificates.Repository.Interfaces;
 using UniversityCertificates.Register.Models;
 using UniversityCertificates.Register.Repository.Interfaces;
@@ -37,7 +35,7 @@ public class RegisterEntryDocumentsService : IRegisterEntryDocumentsService
 
         if (registerEntry == null)
         {
-            throw new ItemDoesNotExistException(Constants.REGISTER_ENTRY_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.REGISTER_ENTRY_DOES_NOT_EXIST);
         }
 
         GetFileRequest? fileRequest =
@@ -47,17 +45,51 @@ public class RegisterEntryDocumentsService : IRegisterEntryDocumentsService
 
         if (fileRequest == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+            );
         }
 
         byte[] documentTemplateBytes = fileRequest.FileContents;
         using var templateStream = new MemoryStream(documentTemplateBytes);
         byte[] resultStream = ReplaceTextWithImage(documentTemplateBytes, qrCode, "[QR]");
+        resultStream = ReplaceText(
+            resultStream,
+            "[SERIAL_NUMBER]",
+            registerEntry.Student.SerialNumber.ToString()
+        );
 
         return resultStream;
     }
 
-    private byte[] ReplaceTextWithImage(byte[] docxBytes, byte[] imageBytes, string replaceText)
+    private byte[] ReplaceText(byte[] docxBytes, string searchText, string replacementText)
+    {
+        using (MemoryStream docxStream = new MemoryStream())
+        {
+            docxStream.Write(docxBytes, 0, docxBytes.Length);
+
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(docxStream, true))
+            {
+                MainDocumentPart mainPart = doc.MainDocumentPart!;
+
+                // Find and replace text in the document
+                foreach (var text in mainPart.Document.Descendants<Text>())
+                {
+                    if (text.Text.Contains(searchText))
+                    {
+                        text.Text = text.Text.Replace(searchText, replacementText);
+                    }
+                }
+
+                // Save the changes
+                doc.MainDocumentPart!.Document.Save();
+            }
+
+            return docxStream.ToArray();
+        }
+    }
+
+    private byte[] ReplaceTextWithImage(byte[] docxBytes, byte[] imageBytes, string searchText)
     {
         using (MemoryStream docxStream = new MemoryStream())
         {
@@ -68,21 +100,20 @@ public class RegisterEntryDocumentsService : IRegisterEntryDocumentsService
                 MainDocumentPart mainPart = doc.MainDocumentPart!;
                 string relationshipId = AddImageToDocument(mainPart, imageBytes);
 
-                // Find and replace [QR] text with image
                 foreach (var text in mainPart.Document.Descendants<Text>())
                 {
-                    if (text.Text.Contains(replaceText))
+                    if (text.Text.Contains(searchText))
                     {
-                        // Create the image element
-                        Drawing drawing = CreateImageElement(relationshipId, 200, 200); // Adjust size as needed
+                        Drawing drawing = CreateImageElement(
+                            relationshipId,
+                            ConstantValues.QR_CODE_SIZE,
+                            ConstantValues.QR_CODE_SIZE
+                        );
 
-                        // Replace the paragraph containing [QR] with the image
                         Paragraph para = text.Ancestors<Paragraph>().FirstOrDefault()!;
                         if (para != null)
                         {
-                            // Clear existing content
                             para.RemoveAllChildren();
-                            // Add the image
                             Run run = new Run(drawing);
                             para.AppendChild(run);
                         }

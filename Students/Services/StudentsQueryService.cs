@@ -21,7 +21,7 @@ public class StudentsQueryService : IStudentsQueryService
 
         if (students.Count() == 0)
         {
-            throw new ItemsDoNotExistException(Constants.STUDENTS_DO_NOT_EXIST);
+            throw new ItemsDoNotExistException(ConstantMessages.STUDENTS_DO_NOT_EXIST);
         }
 
         return students;
@@ -33,7 +33,7 @@ public class StudentsQueryService : IStudentsQueryService
 
         if (student == null)
         {
-            throw new ItemDoesNotExistException(Constants.STUDENT_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.STUDENT_DOES_NOT_EXIST);
         }
 
         return student;

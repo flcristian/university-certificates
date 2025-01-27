@@ -31,12 +31,16 @@ public class CertificateTemplatesCommandService : ICertificateTemplatesCommandSe
             )
         )
         {
-            throw new ItemAlreadyExistsException(Constants.CERTIFICATE_TEMPLATE_ALREADY_EXISTS);
+            throw new ItemAlreadyExistsException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_ALREADY_EXISTS
+            );
         }
 
         if (Path.GetExtension(request.File.FileName) != ".docx")
         {
-            throw new InvalidValueException(Constants.CERTIFICATE_TEMPLATE_FILE_EXTENSION_INVALID);
+            throw new InvalidValueException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_FILE_EXTENSION_INVALID
+            );
         }
 
         CertificateTemplate certificateTemplate =
@@ -62,12 +66,16 @@ public class CertificateTemplatesCommandService : ICertificateTemplatesCommandSe
 
         if (certificateTemplate == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+            );
         }
 
         if (request.File != null && Path.GetExtension(request.File.FileName) != ".docx")
         {
-            throw new InvalidValueException(Constants.CERTIFICATE_TEMPLATE_FILE_EXTENSION_INVALID);
+            throw new InvalidValueException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_FILE_EXTENSION_INVALID
+            );
         }
 
         if (
@@ -78,7 +86,9 @@ public class CertificateTemplatesCommandService : ICertificateTemplatesCommandSe
             )
         )
         {
-            throw new ItemAlreadyExistsException(Constants.CERTIFICATE_TEMPLATE_ALREADY_EXISTS);
+            throw new ItemAlreadyExistsException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_ALREADY_EXISTS
+            );
         }
 
         certificateTemplate.Name = request.Name ?? certificateTemplate.Name;
@@ -108,7 +118,9 @@ public class CertificateTemplatesCommandService : ICertificateTemplatesCommandSe
 
         if (certificateTemplate == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+            );
         }
 
         await _certificateTemplateFilesRepository.DeleteCertificateTemplateFileAsync(id);
@@ -123,11 +135,13 @@ public class CertificateTemplatesCommandService : ICertificateTemplatesCommandSe
 
         if (certificateTemplate == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+            );
         }
         if (!certificateTemplate.Active)
         {
-            throw new InvalidValueException(Constants.CERTIFICATE_TEMPLATE_NOT_ACTIVE);
+            throw new InvalidValueException(ConstantMessages.CERTIFICATE_TEMPLATE_NOT_ACTIVE);
         }
 
         return await _certificateTemplatesRepository.SoftDeleteCertificateTemplateAsync(id);

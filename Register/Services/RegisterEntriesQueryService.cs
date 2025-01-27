@@ -22,7 +22,7 @@ public class RegisterEntriesQueryService : IRegisterEntriesQueryService
 
         if (registerEntries.Count() == 0)
         {
-            throw new ItemsDoNotExistException(Constants.REGISTER_ENTRIES_DO_NOT_EXIST);
+            throw new ItemsDoNotExistException(ConstantMessages.REGISTER_ENTRIES_DO_NOT_EXIST);
         }
 
         return registerEntries;
@@ -36,7 +36,7 @@ public class RegisterEntriesQueryService : IRegisterEntriesQueryService
 
         if (registerEntry == null)
         {
-            throw new ItemDoesNotExistException(Constants.REGISTER_ENTRY_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.REGISTER_ENTRY_DOES_NOT_EXIST);
         }
 
         return registerEntry;

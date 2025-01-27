@@ -24,7 +24,7 @@ public class StudentsCommandService : IStudentsCommandService
             )
         )
         {
-            throw new ItemAlreadyExistsException(Constants.STUDENT_ALREADY_EXISTS);
+            throw new ItemAlreadyExistsException(ConstantMessages.STUDENT_ALREADY_EXISTS);
         }
 
         return await _studentRepository.AddStudentAsync(request);
@@ -38,7 +38,7 @@ public class StudentsCommandService : IStudentsCommandService
 
         if (student == null)
         {
-            throw new ItemDoesNotExistException(Constants.STUDENT_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.STUDENT_DOES_NOT_EXIST);
         }
 
         if (
@@ -49,7 +49,7 @@ public class StudentsCommandService : IStudentsCommandService
             && (request.Department == null || request.Department == student.Department)
         )
         {
-            throw new InvalidValueException(Constants.STUDENT_NOT_MODIFIED);
+            throw new InvalidValueException(ConstantMessages.STUDENT_NOT_MODIFIED);
         }
 
         return await _studentRepository.UpdateStudentAsync(request);
@@ -61,7 +61,7 @@ public class StudentsCommandService : IStudentsCommandService
 
         if (student == null)
         {
-            throw new ItemDoesNotExistException(Constants.STUDENT_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.STUDENT_DOES_NOT_EXIST);
         }
 
         return await _studentRepository.DeleteStudentAsync(serialNumber);

@@ -14,7 +14,6 @@ namespace UniversityCertificates.Register.Services;
 public class RegisterEntryQRCodesService : IRegisterEntryQRCodesService
 {
     private readonly IRegisterEntriesRepository _registerEntriesRepository;
-    private const int QR_CODE_SIZE = 128;
 
     public RegisterEntryQRCodesService(IRegisterEntriesRepository registerEntriesRepository)
     {
@@ -29,7 +28,7 @@ public class RegisterEntryQRCodesService : IRegisterEntryQRCodesService
 
         if (registerEntry == null)
         {
-            throw new ItemDoesNotExistException(Constants.REGISTER_ENTRY_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.REGISTER_ENTRY_DOES_NOT_EXIST);
         }
 
         QRCodeData qrCodeData = new()
@@ -54,9 +53,11 @@ public class RegisterEntryQRCodesService : IRegisterEntryQRCodesService
             Format = BarcodeFormat.QR_CODE,
             Options = new ZXing.Common.EncodingOptions
             {
-                Height = QR_CODE_SIZE,
-                Width = QR_CODE_SIZE,
-                Margin = 1,
+                Height = ConstantValues.QR_CODE_SIZE,
+                Width = ConstantValues.QR_CODE_SIZE,
+                Margin = 4,
+                PureBarcode = true,
+                NoPadding = true,
             },
         };
 
@@ -64,6 +65,7 @@ public class RegisterEntryQRCodesService : IRegisterEntryQRCodesService
 
         using (SKBitmap bitmap = new SKBitmap(pixelData.Width, pixelData.Height))
         {
+            // Direct pixel manipulation without any anti-aliasing
             for (int y = 0; y < pixelData.Height; y++)
             {
                 for (int x = 0; x < pixelData.Width; x++)

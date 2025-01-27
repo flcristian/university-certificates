@@ -36,7 +36,7 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
 
         if (student == null)
         {
-            throw new ItemDoesNotExistException(Constants.STUDENT_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.STUDENT_DOES_NOT_EXIST);
         }
 
         if (
@@ -48,7 +48,7 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
             )
         )
         {
-            throw new ItemAlreadyExistsException(Constants.REGISTER_ENTRY_ALREADY_EXISTS);
+            throw new ItemAlreadyExistsException(ConstantMessages.REGISTER_ENTRY_ALREADY_EXISTS);
         }
 
         return await _registerEntriesRepository.AddRegisterEntryAsync(request);
@@ -62,7 +62,7 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
 
         if (registerEntry == null)
         {
-            throw new ItemDoesNotExistException(Constants.REGISTER_ENTRY_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.REGISTER_ENTRY_DOES_NOT_EXIST);
         }
 
         if (
@@ -76,7 +76,7 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
 
             if (student == null)
             {
-                throw new ItemDoesNotExistException(Constants.STUDENT_DOES_NOT_EXIST);
+                throw new ItemDoesNotExistException(ConstantMessages.STUDENT_DOES_NOT_EXIST);
             }
         }
 
@@ -92,11 +92,13 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
 
             if (certificateTemplate == null)
             {
-                throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+                throw new ItemDoesNotExistException(
+                    ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+                );
             }
             if (!certificateTemplate.Active)
             {
-                throw new InvalidValueException(Constants.CERTIFICATE_TEMPLATE_NOT_ACTIVE);
+                throw new InvalidValueException(ConstantMessages.CERTIFICATE_TEMPLATE_NOT_ACTIVE);
             }
         }
 
@@ -120,11 +122,13 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
         {
             if (existingExtry.Id != request.Id)
             {
-                throw new ItemAlreadyExistsException(Constants.REGISTER_ENTRY_ALREADY_EXISTS);
+                throw new ItemAlreadyExistsException(
+                    ConstantMessages.REGISTER_ENTRY_ALREADY_EXISTS
+                );
             }
             else
             {
-                throw new InvalidValueException(Constants.REGISTER_ENTRY_NOT_MODIFIED);
+                throw new InvalidValueException(ConstantMessages.REGISTER_ENTRY_NOT_MODIFIED);
             }
         }
 
@@ -139,7 +143,7 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
 
         if (registerEntry == null)
         {
-            throw new ItemDoesNotExistException(Constants.REGISTER_ENTRY_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(ConstantMessages.REGISTER_ENTRY_DOES_NOT_EXIST);
         }
 
         return await _registerEntriesRepository.DeleteRegisterEntryAsync(id);

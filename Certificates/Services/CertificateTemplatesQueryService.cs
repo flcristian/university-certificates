@@ -28,7 +28,7 @@ public class CertificateTemplatesQueryService : ICertificateTemplatesQueryServic
 
         if (certificateTemplates.Count() == 0)
         {
-            throw new ItemsDoNotExistException(Constants.CERTIFICATE_TEMPLATES_DO_NOT_EXIST);
+            throw new ItemsDoNotExistException(ConstantMessages.CERTIFICATE_TEMPLATES_DO_NOT_EXIST);
         }
 
         return certificateTemplates;
@@ -41,7 +41,9 @@ public class CertificateTemplatesQueryService : ICertificateTemplatesQueryServic
 
         if (certificateTemplate == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+            );
         }
 
         return certificateTemplate;
@@ -54,7 +56,9 @@ public class CertificateTemplatesQueryService : ICertificateTemplatesQueryServic
 
         if (certificateTemplate == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
+            );
         }
 
         GetFileRequest? fileRequest =
@@ -62,7 +66,9 @@ public class CertificateTemplatesQueryService : ICertificateTemplatesQueryServic
 
         if (fileRequest == null)
         {
-            throw new ItemDoesNotExistException(Constants.CERTIFICATE_TEMPLATE_FILE_DOES_NOT_EXIST);
+            throw new ItemDoesNotExistException(
+                ConstantMessages.CERTIFICATE_TEMPLATE_FILE_DOES_NOT_EXIST
+            );
         }
 
         return fileRequest;
