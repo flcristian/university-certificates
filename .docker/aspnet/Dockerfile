@@ -4,10 +4,12 @@ ARG GROUP_ID=1000
 ARG USERNAME=aspnet 
 ARG GROUPNAME=aspnet
 
+# Install GDI+ dependencies
+RUN apk add --no-cache shadow libgdiplus
+
 # Set up user and group
-RUN apk add --no-cache shadow && \
-    addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}
+RUN addgroup -g ${GROUP_ID} ${GROUPNAME} && \
+    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME} 
 
 WORKDIR /app
 EXPOSE 8080
@@ -21,10 +23,12 @@ ARG GROUP_ID=1000
 ARG USERNAME=aspnet 
 ARG GROUPNAME=aspnet
 
+# Install build dependencies
+RUN apk add --no-cache shadow libgdiplus
+
 # Set up user and group
-RUN apk add --no-cache shadow && \
-    addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}
+RUN addgroup -g ${GROUP_ID} ${GROUPNAME} && \
+    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME} 
 
 ENV BUILD_CONFIGURATION=Release
 ENV ASPNETCORE_ENVIRONMENT=Production
@@ -47,10 +51,12 @@ ARG GROUP_ID=1000
 ARG USERNAME=aspnet 
 ARG GROUPNAME=aspnet
 
+# Install runtime dependencies
+RUN apk add --no-cache shadow libgdiplus
+
 # Set up user and group
-RUN apk add --no-cache shadow && \
-    addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}
+RUN addgroup -g ${GROUP_ID} ${GROUPNAME} && \
+    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}    
 
 WORKDIR /app
 COPY --from=publish /app/publish . 
