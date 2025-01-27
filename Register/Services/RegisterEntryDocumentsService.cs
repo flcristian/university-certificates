@@ -49,6 +49,7 @@ public class RegisterEntryDocumentsService : IRegisterEntryDocumentsService
         using var templateStream = new MemoryStream(documentTemplateBytes);
         using var resultStream = new MemoryStream();
 
+        // Load document from template bytes
         using (var document = DocX.Load(templateStream))
         {
             var qrParagraph = document.Paragraphs.FirstOrDefault(p => p.Text.Contains("[QR]"));

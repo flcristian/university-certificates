@@ -1,15 +1,17 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 ARG USER_ID=1000 
 ARG GROUP_ID=1000 
 ARG USERNAME=aspnet 
 ARG GROUPNAME=aspnet
 
 # Install GDI+ dependencies
-RUN apk add --no-cache shadow libgdiplus
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgdiplus \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set up user and group
-RUN addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME} 
+RUN groupadd -g ${GROUP_ID} ${GROUPNAME} && \
+    useradd -u ${USER_ID} -g ${GROUPNAME} -m ${USERNAME}
 
 WORKDIR /app
 EXPOSE 8080
@@ -17,18 +19,20 @@ EXPOSE 8080
 # Ensure correct permissions
 RUN chown -R ${USERNAME}:${GROUPNAME} /app
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG USER_ID=1000 
 ARG GROUP_ID=1000 
 ARG USERNAME=aspnet 
 ARG GROUPNAME=aspnet
 
 # Install build dependencies
-RUN apk add --no-cache shadow libgdiplus
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgdiplus \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set up user and group
-RUN addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME} 
+RUN groupadd -g ${GROUP_ID} ${GROUPNAME} && \
+    useradd -u ${USER_ID} -g ${GROUPNAME} -m ${USERNAME}
 
 ENV BUILD_CONFIGURATION=Release
 ENV ASPNETCORE_ENVIRONMENT=Production
@@ -45,18 +49,20 @@ RUN dotnet build "${PROJECT_NAME}.csproj" -c $BUILD_CONFIGURATION -o /app/build
 FROM build AS publish
 RUN dotnet publish "${PROJECT_NAME}.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 ARG USER_ID=1000 
 ARG GROUP_ID=1000 
 ARG USERNAME=aspnet 
 ARG GROUPNAME=aspnet
 
 # Install runtime dependencies
-RUN apk add --no-cache shadow libgdiplus
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgdiplus \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set up user and group
-RUN addgroup -g ${GROUP_ID} ${GROUPNAME} && \
-    adduser -u ${USER_ID} -G ${GROUPNAME} -D ${USERNAME}    
+RUN groupadd -g ${GROUP_ID} ${GROUPNAME} && \
+    useradd -u ${USER_ID} -g ${GROUPNAME} -m ${USERNAME}
 
 WORKDIR /app
 COPY --from=publish /app/publish . 
