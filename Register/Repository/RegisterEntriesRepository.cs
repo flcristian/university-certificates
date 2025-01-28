@@ -54,7 +54,7 @@ public class RegisterEntriesRepository : IRegisterEntriesRepository
         registerEntry.Reviewed = request.Reviewed ?? registerEntry.Reviewed;
         registerEntry.Accepted = request.Accepted ?? registerEntry.Accepted;
         registerEntry.SelectedTemplateId =
-            request.SelectedTemplate ?? registerEntry.SelectedTemplateId;
+            request.SelectedTemplateId ?? registerEntry.SelectedTemplateId;
 
         RegisterEntry updatedRegisterEntry = _context.RegisterEntries.Update(registerEntry).Entity;
         await _context.SaveChangesAsync();

@@ -8,6 +8,7 @@ using UniversityCertificates.Students.Models;
 using UniversityCertificates.Students.Repository.Interfaces;
 using UniversityCertificates.System.Constants;
 using UniversityCertificates.System.Exceptions;
+using UniversityCertificates.System.Utility.Services;
 
 namespace UniversityCertificates.Register.Services;
 
@@ -16,16 +17,25 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
     private readonly IRegisterEntriesRepository _registerEntriesRepository;
     private readonly IStudentsRepository _studentsRepository;
     private readonly ICertificateTemplatesRepository _certificateTemplatesRepository;
+    private readonly IRegisterEntryDocxService _registerEntryDocxService;
+    private readonly IRegisterEntryQRCodesService _registerEntryQRCodesService;
+    private readonly EmailService _emailService;
 
     public RegisterEntriesCommandService(
         IRegisterEntriesRepository registerEntriesRepository,
         IStudentsRepository studentsRepository,
-        ICertificateTemplatesRepository certificateTemplatesRepository
+        ICertificateTemplatesRepository certificateTemplatesRepository,
+        IRegisterEntryDocxService registerEntryDocxService,
+        IRegisterEntryQRCodesService registerEntryQRCodesService,
+        EmailService emailService
     )
     {
         _registerEntriesRepository = registerEntriesRepository;
         _studentsRepository = studentsRepository;
         _certificateTemplatesRepository = certificateTemplatesRepository;
+        _registerEntryDocxService = registerEntryDocxService;
+        _registerEntryQRCodesService = registerEntryQRCodesService;
+        _emailService = emailService;
     }
 
     public async Task<RegisterEntry> AddRegisterEntryAsync(CreateRegisterEntryRequest request)
@@ -81,13 +91,13 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
         }
 
         if (
-            request.SelectedTemplate != null
-            && request.SelectedTemplate != registerEntry.SelectedTemplateId
+            request.SelectedTemplateId != null
+            && request.SelectedTemplateId != registerEntry.SelectedTemplateId
         )
         {
             CertificateTemplate? certificateTemplate =
                 await _certificateTemplatesRepository.GetCertificateTemplateByIdAsync(
-                    request.SelectedTemplate!.Value
+                    request.SelectedTemplateId!.Value
                 );
 
             if (certificateTemplate == null)
@@ -115,7 +125,9 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
                 StringComparison.OrdinalIgnoreCase
             )
             && entry.SelectedTemplateId
-                == (request.SelectedTemplate ?? registerEntry.SelectedTemplateId)
+                == (request.SelectedTemplateId ?? registerEntry.SelectedTemplateId)
+            && entry.Accepted == (request.Accepted ?? registerEntry.Accepted)
+            && entry.Reviewed == (request.Reviewed ?? registerEntry.Reviewed)
         );
 
         if (existingExtry != null)
@@ -132,7 +144,38 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
             }
         }
 
-        return await _registerEntriesRepository.UpdateRegisterEntryAsync(request);
+        bool accepted = registerEntry.Accepted; // Remember the state before updating
+        registerEntry = await _registerEntriesRepository.UpdateRegisterEntryAsync(request);
+
+        if (!accepted && registerEntry.Accepted && (registerEntry.SelectedTemplateId != null))
+        {
+            List<(byte[] fileContents, string fileName)> attachedFiles =
+                new List<(byte[], string)>();
+
+            byte[] qrCode =
+                await _registerEntryQRCodesService.GenerateQRCodeForRegisterEntryByIdAsync(
+                    registerEntry.Id
+                );
+
+            attachedFiles.Add(
+                (
+                    await _registerEntryDocxService.GenerateCertificateForRegisterEntryByIdAsync(
+                        registerEntry.Id,
+                        qrCode
+                    ),
+                    "Certificate.docx"
+                )
+            );
+
+            await _emailService.SendEmail(
+                registerEntry.Student.Email,
+                ConstantEmails.CERTIFICATE_ACCEPTED_EMAIL_SUBJECT,
+                ConstantEmails.CERTIFICATE_ACCEPTED_EMAIL_BODY,
+                attachedFiles
+            );
+        }
+
+        return registerEntry;
     }
 
     public async Task<RegisterEntry> DeleteRegisterEntryAsync(int id)

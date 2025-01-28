@@ -8,5 +8,5 @@ public record UpdateRegisterEntryRequest
     public string? Reason { get; set; }
     public bool? Reviewed { get; set; }
     public bool? Accepted { get; set; }
-    public int? SelectedTemplate { get; set; }
+    public int? SelectedTemplateId { get; set; }
 }

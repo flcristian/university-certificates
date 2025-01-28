@@ -5,6 +5,7 @@ using UniversityCertificates.Register.DTOs;
 using UniversityCertificates.Register.Models;
 using UniversityCertificates.Register.Services.Interfaces;
 using UniversityCertificates.System.Exceptions;
+using UniversityCertificates.System.Utility.Services;
 
 namespace UniversityCertificates.Register.Controllers;
 
@@ -16,6 +17,7 @@ public class RegisterEntriesController : RegisterEntriesApiController
     private readonly IRegisterEntryDocxService _registerEntryDocumentsService;
     private readonly IRegisterEntryXlsxService _registerEntryXlsxService;
     private readonly ILogger<RegisterEntriesController> _logger;
+    private readonly EmailService _emailService;
 
     public RegisterEntriesController(
         IRegisterEntriesQueryService registerEntriesQueryService,
@@ -23,7 +25,8 @@ public class RegisterEntriesController : RegisterEntriesApiController
         IRegisterEntryQRCodesService registerEntryQRCodesService,
         IRegisterEntryDocxService registerEntryDocumentsService,
         IRegisterEntryXlsxService registerEntryXlsxService,
-        ILogger<RegisterEntriesController> logger
+        ILogger<RegisterEntriesController> logger,
+        EmailService emailService
     )
     {
         _registerEntriesQueryService = registerEntriesQueryService;
@@ -32,6 +35,7 @@ public class RegisterEntriesController : RegisterEntriesApiController
         _registerEntryDocumentsService = registerEntryDocumentsService;
         _registerEntryXlsxService = registerEntryXlsxService;
         _logger = logger;
+        _emailService = emailService;
     }
 
     public override async Task<ActionResult<IEnumerable<RegisterEntry>>> GetRegisterEntries()

@@ -62,6 +62,12 @@ builder.Services.AddScoped<
 
 #endregion
 
+#region UTILITY
+
+builder.Services.AddScoped<EmailService>();
+
+#endregion
+
 builder.Services.AddLogging();
 builder.Services.AddSwaggerGen(c =>
 {
