@@ -17,6 +17,7 @@ using UniversityCertificates.Students.Repository.Interfaces;
 using UniversityCertificates.Students.Services;
 using UniversityCertificates.Students.Services.Interfaces;
 using UniversityCertificates.System;
+using UniversityCertificates.System.Utility.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -30,23 +31,29 @@ builder
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-#region SERVICES
+#region REPOSITORIES
 
 builder.Services.AddScoped<IStudentsRepository, StudentsRepository>();
-builder.Services.AddScoped<IStudentsQueryService, StudentsQueryService>();
-builder.Services.AddScoped<IStudentsCommandService, StudentsCommandService>();
-
 builder.Services.AddScoped<IRegisterEntriesRepository, RegisterEntriesRepository>();
-builder.Services.AddScoped<IRegisterEntriesQueryService, RegisterEntriesQueryService>();
-builder.Services.AddScoped<IRegisterEntriesCommandService, RegisterEntriesCommandService>();
-builder.Services.AddScoped<IRegisterEntryQRCodesService, RegisterEntryQRCodesService>();
-builder.Services.AddScoped<IRegisterEntryDocumentsService, RegisterEntryDocumentsService>();
-
 builder.Services.AddScoped<ICertificateTemplatesRepository, CertificateTemplatesRepository>();
 builder.Services.AddScoped<
     ICertificateTemplateFilesRepository,
     CertificateTemplateFilesRepository
 >();
+
+#endregion
+
+#region SERVICES
+
+builder.Services.AddScoped<IStudentsQueryService, StudentsQueryService>();
+builder.Services.AddScoped<IStudentsCommandService, StudentsCommandService>();
+
+builder.Services.AddScoped<IRegisterEntriesQueryService, RegisterEntriesQueryService>();
+builder.Services.AddScoped<IRegisterEntriesCommandService, RegisterEntriesCommandService>();
+builder.Services.AddScoped<IRegisterEntryQRCodesService, RegisterEntryQRCodesService>();
+builder.Services.AddScoped<IRegisterEntryDocxService, RegisterEntryDocxService>();
+builder.Services.AddScoped<IRegisterEntryXlsxService, RegisterEntryXlsxService>();
+
 builder.Services.AddScoped<ICertificateTemplatesQueryService, CertificateTemplatesQueryService>();
 builder.Services.AddScoped<
     ICertificateTemplatesCommandService,

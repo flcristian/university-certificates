@@ -49,4 +49,9 @@ public abstract class RegisterEntriesApiController : ControllerBase
     [ProducesResponseType(statusCode: 200, type: typeof(byte[]))]
     [ProducesResponseType(statusCode: 404, type: typeof(string))]
     public abstract Task<ActionResult> GenerateCertificateForRegisterEntryById([FromRoute] int id);
+
+    [HttpGet("export-register-entries-xlsx")]
+    [ProducesResponseType(statusCode: 200, type: typeof(byte[]))]
+    [ProducesResponseType(statusCode: 404, type: typeof(string))]
+    public abstract Task<ActionResult> GenerateRegisterEntriesExcel();
 }

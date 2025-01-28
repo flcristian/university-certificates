@@ -1,6 +1,6 @@
 namespace UniversityCertificates.Register.Services.Interfaces;
 
-public interface IRegisterEntryDocumentsService
+public interface IRegisterEntryDocxService
 {
     public Task<byte[]> GenerateCertificateForRegisterEntryByIdAsync(int id, byte[] qrCode);
 }

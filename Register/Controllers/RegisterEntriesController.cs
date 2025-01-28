@@ -13,14 +13,16 @@ public class RegisterEntriesController : RegisterEntriesApiController
     private readonly IRegisterEntriesQueryService _registerEntriesQueryService;
     private readonly IRegisterEntriesCommandService _registerEntriesCommandService;
     private readonly IRegisterEntryQRCodesService _registerEntryQRCodesService;
-    private readonly IRegisterEntryDocumentsService _registerEntryDocumentsService;
+    private readonly IRegisterEntryDocxService _registerEntryDocumentsService;
+    private readonly IRegisterEntryXlsxService _registerEntryXlsxService;
     private readonly ILogger<RegisterEntriesController> _logger;
 
     public RegisterEntriesController(
         IRegisterEntriesQueryService registerEntriesQueryService,
         IRegisterEntriesCommandService registerEntriesCommandService,
         IRegisterEntryQRCodesService registerEntryQRCodesService,
-        IRegisterEntryDocumentsService registerEntryDocumentsService,
+        IRegisterEntryDocxService registerEntryDocumentsService,
+        IRegisterEntryXlsxService registerEntryXlsxService,
         ILogger<RegisterEntriesController> logger
     )
     {
@@ -28,6 +30,7 @@ public class RegisterEntriesController : RegisterEntriesApiController
         _registerEntriesCommandService = registerEntriesCommandService;
         _registerEntryQRCodesService = registerEntryQRCodesService;
         _registerEntryDocumentsService = registerEntryDocumentsService;
+        _registerEntryXlsxService = registerEntryXlsxService;
         _logger = logger;
     }
 
@@ -178,10 +181,36 @@ public class RegisterEntriesController : RegisterEntriesApiController
 
             return File(
                 certificate,
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "certificate.docx"
             );
         }
         catch (ItemDoesNotExistException e)
+        {
+            _logger.LogError(e.Message);
+            return NotFound(e.Message);
+        }
+    }
+
+    public override async Task<ActionResult> GenerateRegisterEntriesExcel()
+    {
+        try
+        {
+            byte[] excelBytes =
+                await _registerEntryXlsxService.GenerateExcelForRegisterEntriesAsync();
+
+            if (excelBytes == null || excelBytes.Length == 0)
+            {
+                return BadRequest("Failed to generate Excel file");
+            }
+
+            return File(
+                excelBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "register-export.xlsx"
+            );
+        }
+        catch (ItemsDoNotExistException e)
         {
             _logger.LogError(e.Message);
             return NotFound(e.Message);

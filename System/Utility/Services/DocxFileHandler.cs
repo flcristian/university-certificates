@@ -1,68 +1,15 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using UniversityCertificates.Certificates.Repository.Interfaces;
-using UniversityCertificates.Register.Models;
-using UniversityCertificates.Register.Repository.Interfaces;
-using UniversityCertificates.Register.Services.Interfaces;
 using UniversityCertificates.System.Constants;
-using UniversityCertificates.System.Exceptions;
-using UniversityCertificates.System.Utility.DTOs;
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 
-namespace UniversityCertificates.Register.Services;
+namespace UniversityCertificates.System.Utility.Services;
 
-public class RegisterEntryDocumentsService : IRegisterEntryDocumentsService
+public static class DocxFileHandler
 {
-    private readonly IRegisterEntriesRepository _registerEntriesRepository;
-    private readonly ICertificateTemplateFilesRepository _certificateTemplateFilesRepository;
-
-    public RegisterEntryDocumentsService(
-        IRegisterEntriesRepository registerEntriesRepository,
-        ICertificateTemplateFilesRepository certificateTemplateFilesRepository
-    )
-    {
-        _registerEntriesRepository = registerEntriesRepository;
-        _certificateTemplateFilesRepository = certificateTemplateFilesRepository;
-    }
-
-    public async Task<byte[]> GenerateCertificateForRegisterEntryByIdAsync(int id, byte[] qrCode)
-    {
-        RegisterEntry? registerEntry = await _registerEntriesRepository.GetRegisterEntryByIdAsync(
-            id
-        );
-
-        if (registerEntry == null)
-        {
-            throw new ItemDoesNotExistException(ConstantMessages.REGISTER_ENTRY_DOES_NOT_EXIST);
-        }
-
-        GetFileRequest? fileRequest =
-            await _certificateTemplateFilesRepository.GetCertificateTemplateFileByIdAsync(
-                registerEntry.SelectedTemplateId!.Value
-            );
-
-        if (fileRequest == null)
-        {
-            throw new ItemDoesNotExistException(
-                ConstantMessages.CERTIFICATE_TEMPLATE_DOES_NOT_EXIST
-            );
-        }
-
-        byte[] documentTemplateBytes = fileRequest.FileContents;
-        using var templateStream = new MemoryStream(documentTemplateBytes);
-        byte[] resultStream = ReplaceTextWithImage(documentTemplateBytes, qrCode, "[QR]");
-        resultStream = ReplaceText(
-            resultStream,
-            "[SERIAL_NUMBER]",
-            registerEntry.Student.SerialNumber.ToString()
-        );
-
-        return resultStream;
-    }
-
-    private byte[] ReplaceText(byte[] docxBytes, string searchText, string replacementText)
+    public static byte[] ReplaceText(byte[] docxBytes, string searchText, string replacementText)
     {
         using (MemoryStream docxStream = new MemoryStream())
         {
@@ -72,24 +19,45 @@ public class RegisterEntryDocumentsService : IRegisterEntryDocumentsService
             {
                 MainDocumentPart mainPart = doc.MainDocumentPart!;
 
-                // Find and replace text in the document
-                foreach (var text in mainPart.Document.Descendants<Text>())
+                var paragraphs = mainPart.Document.Descendants<Paragraph>().ToList();
+
+                foreach (var paragraph in paragraphs)
                 {
-                    if (text.Text.Contains(searchText))
+                    string paragraphText = paragraph.InnerText;
+
+                    if (paragraphText.Contains(searchText))
                     {
-                        text.Text = text.Text.Replace(searchText, replacementText);
+                        var originalRuns = paragraph.Elements<Run>().ToList();
+                        var firstRunProperties = originalRuns
+                            .FirstOrDefault()
+                            ?.RunProperties?.CloneNode(true);
+
+                        string newText = paragraphText.Replace(searchText, replacementText);
+
+                        var newRun = new Run();
+                        if (firstRunProperties != null)
+                        {
+                            newRun.AppendChild(firstRunProperties);
+                        }
+                        newRun.AppendChild(new Text(newText));
+
+                        paragraph.RemoveAllChildren<Run>();
+                        paragraph.AppendChild(newRun);
                     }
                 }
 
-                // Save the changes
-                doc.MainDocumentPart!.Document.Save();
+                mainPart.Document.Save();
             }
 
             return docxStream.ToArray();
         }
     }
 
-    private byte[] ReplaceTextWithImage(byte[] docxBytes, byte[] imageBytes, string searchText)
+    public static byte[] ReplaceTextWithImage(
+        byte[] docxBytes,
+        byte[] imageBytes,
+        string searchText
+    )
     {
         using (MemoryStream docxStream = new MemoryStream())
         {
