@@ -11,6 +11,8 @@ public static class ConstantMessages
     public const string REGISTER_ENTRY_DOES_NOT_EXIST = "This register entry does not exist.";
     public const string REGISTER_ENTRIES_DO_NOT_EXIST = "There are no register entries.";
     public const string REGISTER_ENTRY_NOT_MODIFIED = "Register entry was not modified.";
+    public static readonly string REGISTER_ENTRY_MUST_WAIT =
+        $"You must wait {ConstantValues.REGISTER_ENTRY_WAIT_MINUTES} minutes before submitting another request.";
 
     public const string CERTIFICATE_TEMPLATE_ALREADY_EXISTS =
         "This certificate template already exists.";

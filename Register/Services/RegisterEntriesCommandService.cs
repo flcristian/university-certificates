@@ -61,6 +61,18 @@ public class RegisterEntriesCommandService : IRegisterEntriesCommandService
             throw new ItemAlreadyExistsException(ConstantMessages.REGISTER_ENTRY_ALREADY_EXISTS);
         }
 
+        if (
+            (await _registerEntriesRepository.GetRegisterEntriesAsync()).Any(entry =>
+                entry.StudentSerialNumber == request.StudentSerialNumber
+                && entry.DateOfIssue
+                    >= request.DateOfIssue.AddMinutes(-ConstantValues.REGISTER_ENTRY_WAIT_MINUTES)
+                && entry.DateOfIssue <= request.DateOfIssue
+            )
+        )
+        {
+            throw new ItemAlreadyExistsException(ConstantMessages.REGISTER_ENTRY_MUST_WAIT);
+        }
+
         return await _registerEntriesRepository.AddRegisterEntryAsync(request);
     }
 
