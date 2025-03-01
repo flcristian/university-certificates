@@ -41,6 +41,10 @@ jobs:
         DB_PASSWORD=${{ secrets.DB_PASSWORD }}
         DB_PORT=${{ secrets.DB_PORT }}
         DB_CONNECT_PORT=${{ secrets.DB_CONNECT_PORT }}
+        SMTP_HOST=${{ secrets.SMTP_HOST }}
+        SMTP_PORT=${{ secrets.SMTP_PORT }}
+        SMTP_EMAIL=${{ secrets.SMTP_EMAIL }}
+        SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
         EOF
     
     - name: Build and push Docker image
