@@ -91,10 +91,11 @@ builder.WebHost.UseKestrel(options =>
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
+string clientOrigin = $"http://localhost:{Env.GetString("CLIENT_PORT")}";
 builder.Services.AddCors(options =>
     options.AddPolicy(
         "university-certificates",
-        domain => domain.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod()
+        domain => domain.WithOrigins(clientOrigin).AllowAnyHeader().AllowAnyMethod()
     )
 );
 
