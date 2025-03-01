@@ -91,7 +91,7 @@ builder.WebHost.UseKestrel(options =>
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-string clientOrigin = $"http://localhost:{Env.GetString("CLIENT_PORT")}";
+string clientOrigin = $"http://{Env.GetString("CLIENT_ADDRESS")}:{Env.GetString("CLIENT_PORT")}";
 builder.Services.AddCors(options =>
     options.AddPolicy(
         "university-certificates",
@@ -136,6 +136,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseCors("university-certificates");
 
 app.MapControllers();
 
@@ -145,5 +146,4 @@ using (IServiceScope scope = app.Services.CreateScope())
     runner.MigrateUp();
 }
 
-app.UseCors("university-certificates");
 app.Run();
