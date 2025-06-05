@@ -13,7 +13,6 @@ public class CreateStudentsTable : Migration
             .WithColumn("serial_number")
             .AsInt32()
             .PrimaryKey()
-            .Identity()
             .WithColumn("first_name")
             .AsString(64)
             .NotNullable()

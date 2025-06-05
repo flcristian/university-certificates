@@ -14,4 +14,6 @@ public interface IStudentsRepository
     Task<Student> UpdateStudentAsync(UpdateStudentRequest request);
 
     Task<Student> DeleteStudentAsync(int serialNumber);
+
+    Task ClearStudentsAsync();
 }

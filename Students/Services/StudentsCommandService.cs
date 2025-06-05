@@ -21,6 +21,7 @@ public class StudentsCommandService : IStudentsCommandService
         if (
             (await _studentRepository.GetStudentsAsync()).Any(s =>
                 s.Email.Equals(request.Email, StringComparison.InvariantCultureIgnoreCase)
+                || s.SerialNumber == request.SerialNumber
             )
         )
         {

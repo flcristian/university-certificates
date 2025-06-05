@@ -7,7 +7,6 @@ namespace UniversityCertificates.Students.Models;
 public class Student
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("serial_number")]
     public required int SerialNumber { get; set; }
 

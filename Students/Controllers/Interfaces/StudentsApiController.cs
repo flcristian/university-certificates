@@ -39,4 +39,16 @@ public abstract class StudentsApiController : ControllerBase
     [ProducesResponseType(statusCode: 202, type: typeof(Student))]
     [ProducesResponseType(statusCode: 404, type: typeof(string))]
     public abstract Task<ActionResult<Student>> DeleteStudent([FromRoute] int serialNumber);
+
+    [HttpGet("export")]
+    [ProducesResponseType(statusCode: 200, type: typeof(FileContentResult))]
+    [ProducesResponseType(statusCode: 404, type: typeof(string))]
+    public abstract Task<ActionResult> ExportStudentsToExcel();
+
+    [HttpPost("import")]
+    [ProducesResponseType(statusCode: 201, type: typeof(IEnumerable<Student>))]
+    [ProducesResponseType(statusCode: 400, type: typeof(string))]
+    public abstract Task<ActionResult<IEnumerable<Student>>> ImportStudentsFromExcel(
+        IFormFile file
+    );
 }

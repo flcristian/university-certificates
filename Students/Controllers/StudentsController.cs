@@ -11,16 +11,19 @@ public class StudentsController : StudentsApiController
 {
     private readonly IStudentsQueryService _studentQueryService;
     private readonly IStudentsCommandService _studentCommandService;
+    private readonly IStudentsXlsxService _studentsXlsxService;
     private readonly ILogger<StudentsController> _logger;
 
     public StudentsController(
         IStudentsQueryService studentQueryService,
         IStudentsCommandService studentCommandService,
+        IStudentsXlsxService studentsXlsxService,
         ILogger<StudentsController> logger
     )
     {
         _studentQueryService = studentQueryService;
         _studentCommandService = studentCommandService;
+        _studentsXlsxService = studentsXlsxService;
         _logger = logger;
     }
 
@@ -107,6 +110,59 @@ public class StudentsController : StudentsApiController
         {
             _logger.LogError(e.Message);
             return NotFound(e.Message);
+        }
+    }
+
+    public override async Task<ActionResult> ExportStudentsToExcel()
+    {
+        try
+        {
+            byte[] excelBytes = await _studentsXlsxService.GenerateExcelForStudentsAsync();
+
+            return File(
+                excelBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "students.xlsx"
+            );
+        }
+        catch (ItemsDoNotExistException e)
+        {
+            _logger.LogError(e.Message);
+            return NotFound(e.Message);
+        }
+    }
+
+    public override async Task<ActionResult<IEnumerable<Student>>> ImportStudentsFromExcel(
+        IFormFile file
+    )
+    {
+        try
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file was uploaded.");
+            }
+
+            if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("Only .xlsx files are allowed.");
+            }
+
+            using var stream = file.OpenReadStream();
+            IEnumerable<Student> importedStudents =
+                await _studentsXlsxService.ImportStudentsFromExcelAsync(stream);
+
+            return CreatedAtAction(nameof(GetStudents), importedStudents);
+        }
+        catch (InvalidValueException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error importing students from Excel");
+            return BadRequest("An error occurred while importing the Excel file.");
         }
     }
 }

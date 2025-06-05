@@ -63,4 +63,11 @@ public class StudentsRepository : IStudentsRepository
         await _context.SaveChangesAsync();
         return student;
     }
+
+    public async Task ClearStudentsAsync()
+    {
+        var students = await _context.Students.ToListAsync();
+        _context.Students.RemoveRange(students);
+        await _context.SaveChangesAsync();
+    }
 }

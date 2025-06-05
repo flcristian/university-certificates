@@ -27,4 +27,5 @@ public static class ConstantMessages
         "Certificate template file extension must be .docx!";
     public const string CERTIFICATE_TEMPLATE_FILE_DOES_NOT_EXIST =
         "This certificate template file does not exist.";
+    public const string EMPTY_EXCEL_FILE = "The Excel file is empty or does not contain any data.";
 }

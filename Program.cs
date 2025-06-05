@@ -47,6 +47,7 @@ builder.Services.AddScoped<
 
 builder.Services.AddScoped<IStudentsQueryService, StudentsQueryService>();
 builder.Services.AddScoped<IStudentsCommandService, StudentsCommandService>();
+builder.Services.AddScoped<IStudentsXlsxService, StudentsXlsxService>();
 
 builder.Services.AddScoped<IRegisterEntriesQueryService, RegisterEntriesQueryService>();
 builder.Services.AddScoped<IRegisterEntriesCommandService, RegisterEntriesCommandService>();

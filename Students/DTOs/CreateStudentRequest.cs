@@ -4,6 +4,7 @@ namespace UniversityCertificates.Students.DTOs;
 
 public record CreateStudentRequest
 {
+    public required int SerialNumber { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public required string Email { get; set; }
